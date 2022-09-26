@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import FilterData from './FilterData.vue'
 import { ref, Ref } from 'vue'
-import { Header, Item, Order } from '../types'
+import { Filter, Header, Item, Order } from '../types'
 const props = defineProps<{
 	headers: Header[],
 	items: Item[]
@@ -16,6 +17,28 @@ const sort = (value: keyof Item, order: Order) => {
 		return 0
 	})
 }
+const filterItems = ({ column, condition, inputValue }: Filter) => {
+	console.log(new Date('30.08.2022'.split('.').reverse().join('-')).getTime())
+	switch (condition) {
+		case 'equal': {
+			rows.value = rows.value.filter(row => String(row[column]) === inputValue)
+			break
+		}
+		case 'contains': {
+			rows.value = rows.value.filter(row => String(row[column]).includes(inputValue))
+			break
+		}
+		case 'more': {
+			rows.value = rows.value.filter(row => row[column] > inputValue)
+			break
+		}
+		case 'less': {
+			rows.value = rows.value.filter(row => row[column] < inputValue)
+			break
+		}
+	}
+}
+const cancelFilter = () => rows.value = props.items
 </script>
 
 <template>
@@ -39,6 +62,11 @@ const sort = (value: keyof Item, order: Order) => {
 				<td class="body__cell">{{row.title}}</td>
 				<td class="body__cell">{{row.amount}}</td>
 				<td class="body__cell">{{row.distance}}</td>
+			</tr>
+			<tr>
+				<td :colspan="headers.length">
+					<FilterData @filter="filterItems" @cancel="cancelFilter" />
+				</td>
 			</tr>
 		</tbody>
 	</table>
@@ -69,6 +97,7 @@ const sort = (value: keyof Item, order: Order) => {
 	&__head th:last-child,
 	&__body tr:last-child {
 		border-radius: 0 8px 8px 0;
+		background-color: #d8d8d8;
 	}
 
 	&__body td {
@@ -97,6 +126,7 @@ const sort = (value: keyof Item, order: Order) => {
 	flex-direction: column;
 
 	svg {
+		display: inline-block;
 		font-size: 1.6rem;
 		color: #908986;
 		transition: .3s ease;

@@ -1,6 +1,23 @@
+type HeaderText = 'Дата' | 'Название' | 'Количество' | 'Расстояние'
+type HeaderValue = 'date' | 'title' | 'amount' | 'distance'
+
+type ConditionText = 'Равно' | 'Содержит' | 'Больше' | 'Меньше'
+type ConditionValue = 'equal' | 'contains' | 'more' | 'less'
+
 export interface Header {
-	text: string,
-	value: string
+	text: HeaderText,
+	value: HeaderValue
+}
+
+export interface Condition {
+	text: ConditionText,
+	value: ConditionValue
+}
+
+export interface Filter {
+	column: keyof Item,
+	condition: keyof Condition[],
+	inputValue: string
 }
 
 export interface Item {
