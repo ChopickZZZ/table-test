@@ -5,16 +5,20 @@ defineProps<{
 	title: string,
 	list: Header[] | Condition[]
 }>()
+
 const emit = defineEmits<{
 	(event: 'pickItem', item: string): void
 }>()
+
 const mainItem = ref('')
 const isDropDownOpen = ref(false)
+
 const pickItem = (val: string, text: string) => {
 	isDropDownOpen.value = false
 	mainItem.value = text
 	emit('pickItem', val)
 }
+
 </script>
 
 <template>
@@ -49,7 +53,7 @@ const pickItem = (val: string, text: string) => {
 
 	&__body {
 		height: 25px;
-		border-bottom: 1px solid #000;
+		border-bottom: 1px solid #5f2c82;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -62,7 +66,7 @@ const pickItem = (val: string, text: string) => {
 		vertical-align: middle;
 		width: 0;
 		height: 0;
-		border-top: 6px solid #000;
+		border-top: 6px solid #5f2c82;
 		border-left: 6px solid transparent;
 		border-right: 6px solid transparent;
 	}
@@ -76,7 +80,7 @@ const pickItem = (val: string, text: string) => {
 		text-align: left;
 		padding: 0;
 		margin: 0;
-		box-shadow: 0 5px 5px -3px #0003, 0 8px 10px 1px #00000024, 0 3px 14px 2px #0000001f;
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 	}
 
 	&__items.show {
@@ -84,7 +88,8 @@ const pickItem = (val: string, text: string) => {
 	}
 
 	&__item {
-		background-color: #fff;
+		background-color: rgba(255, 255, 255, 0.2);
+		;
 		padding: 5px;
 		cursor: pointer;
 	}

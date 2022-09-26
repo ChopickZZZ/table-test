@@ -1,44 +1,32 @@
 <script setup lang="ts">
 import FilterData from './FilterData.vue'
-import { ref, Ref } from 'vue'
+import PaginationData from './PaginationData.vue'
+import { Ref, computed } from 'vue'
 import { Filter, Header, Item, Order } from '../types'
-const props = defineProps<{
-	headers: Header[],
-	items: Item[]
+import { useStore } from '../store';
+
+defineProps<{
+	headers: Header[]
 }>()
-const rows: Ref<Item[]> = ref([...props.items])
+
+const store = useStore()
+await store.dispatch('fetchItems')
+await store.dispatch('fetchRowsLength')
+const rows: Ref<Item[]> = computed(() => store.state.items)
+
 const sort = (value: keyof Item, order: Order) => {
-	rows.value = rows.value.sort((row1, row2) => {
-		if (order === 'to-bottom') {
-			[row1, row2] = [row2, row1]
-		}
-		if (row1[value] > row2[value]) return 1
-		if (row1[value] < row2[value]) return -1
-		return 0
-	})
+	store.commit('SORT_ITEMS', { value, order })
 }
+
 const filterItems = ({ column, condition, inputValue }: Filter) => {
-	console.log(new Date('30.08.2022'.split('.').reverse().join('-')).getTime())
-	switch (condition) {
-		case 'equal': {
-			rows.value = rows.value.filter(row => String(row[column]) === inputValue)
-			break
-		}
-		case 'contains': {
-			rows.value = rows.value.filter(row => String(row[column]).includes(inputValue))
-			break
-		}
-		case 'more': {
-			rows.value = rows.value.filter(row => row[column] > inputValue)
-			break
-		}
-		case 'less': {
-			rows.value = rows.value.filter(row => row[column] < inputValue)
-			break
-		}
-	}
+	store.commit('FILTER_ITEMS', { column, condition, inputValue })
 }
-const cancelFilter = () => rows.value = props.items
+
+const movePage = (target: 'next' | 'prev') => {
+	store.dispatch('movePage', target)
+}
+
+const cancelFilter = async () => await store.dispatch('fetchItems')
 </script>
 
 <template>
@@ -65,7 +53,10 @@ const cancelFilter = () => rows.value = props.items
 			</tr>
 			<tr>
 				<td :colspan="headers.length">
-					<FilterData @filter="filterItems" @cancel="cancelFilter" />
+					<div class="body__tools">
+						<FilterData @filter="filterItems" @cancel="cancelFilter" />
+						<PaginationData @paginate="movePage" />
+					</div>
 				</td>
 			</tr>
 		</tbody>
@@ -74,7 +65,9 @@ const cancelFilter = () => rows.value = props.items
 
 <style scoped lang="scss">
 .table {
+	margin: 10rem 0;
 	width: 100%;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 
 	&__head th,
 	&__body td {
@@ -82,11 +75,12 @@ const cancelFilter = () => rows.value = props.items
 		text-align: left;
 		border: none;
 		padding: 1rem 1.5rem;
+		color: #fff;
 	}
 
 	&__head th {
 		font-weight: bold;
-		background-color: #d8d8d8;
+		background-color: #55608f;
 	}
 
 	&__head th:first-child,
@@ -97,15 +91,11 @@ const cancelFilter = () => rows.value = props.items
 	&__head th:last-child,
 	&__body tr:last-child {
 		border-radius: 0 8px 8px 0;
-		background-color: #d8d8d8;
 	}
 
 	&__body td {
 		vertical-align: top;
-	}
-
-	&__body tr:nth-child(even) {
-		background-color: #f3f3f3;
+		background-color: rgba(255, 255, 255, 0.2);
 	}
 }
 
@@ -121,6 +111,14 @@ const cancelFilter = () => rows.value = props.items
 	}
 }
 
+.body {
+	&__tools {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+}
+
 .sort-container {
 	display: flex;
 	flex-direction: column;
@@ -128,13 +126,13 @@ const cancelFilter = () => rows.value = props.items
 	svg {
 		display: inline-block;
 		font-size: 1.6rem;
-		color: #908986;
+		color: #fff;
 		transition: .3s ease;
 		cursor: pointer;
 	}
 
 	svg:hover {
-		color: #4d423d;
+		color: darken(#fff, 25)
 	}
 }
 </style>

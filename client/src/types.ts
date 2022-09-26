@@ -22,6 +22,7 @@ export interface Filter {
 
 export interface Item {
 	id: number,
+	cur_date: string,
 	date: string,
 	title: string,
 	amount: number,
