@@ -1,4 +1,4 @@
-# vue-practice-app
+# Test task
 
 ## Project setup
 ```
