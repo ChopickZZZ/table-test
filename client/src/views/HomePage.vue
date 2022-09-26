@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import DataTable from '../components/DataTable.vue'
-const headers = [
+import { Header, Item } from '../types'
+const headers: Header[] = [
 	{ text: 'Дата', value: 'date' },
 	{ text: 'Название', value: 'title' },
 	{ text: 'Количество', value: 'amount' },
 	{ text: 'Расстояние', value: 'distance' },
 ]
-const items = [
+const items: Item[] = [
 	{ id: 1, date: '22.08.2022', title: 'Яблоки', amount: 50, distance: 156 },
 	{ id: 2, date: '05.07.2022', title: 'Груши', amount: 20, distance: 6 },
 	{ id: 3, date: '21.02.2022', title: 'Инжир', amount: 30, distance: 15 },
@@ -19,7 +20,6 @@ const items = [
 	{ id: 10, date: '19.08.2022', title: 'Арбузы', amount: 432, distance: 178 },
 ]
 </script>
-
 
 <template>
 	<div class="container">

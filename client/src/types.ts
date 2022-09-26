@@ -10,3 +10,5 @@ export interface Item {
 	amount: number,
 	distance: number
 }
+
+export type Order = 'to-top' | 'to-bottom'

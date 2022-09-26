@@ -1,26 +1,44 @@
 <script setup lang="ts">
-import { Header, Item } from '../types'
-defineProps<{
+import { ref, Ref } from 'vue'
+import { Header, Item, Order } from '../types'
+const props = defineProps<{
 	headers: Header[],
 	items: Item[]
 }>()
+const rows: Ref<Item[]> = ref([...props.items])
+const sort = (value: keyof Item, order: Order) => {
+	rows.value = rows.value.sort((row1, row2) => {
+		if (order === 'to-bottom') {
+			[row1, row2] = [row2, row1]
+		}
+		if (row1[value] > row2[value]) return 1
+		if (row1[value] < row2[value]) return -1
+		return 0
+	})
+}
 </script>
 
 <template>
 	<table class="table">
-		<thead class="table__head">
+		<thead class="table__head head">
 			<tr>
-				<th v-for="header in headers" :key="header.value">
-					{{header.text}}
+				<th class="head__cell" v-for="header in headers" :key="header.value">
+					<div class="head__inner">
+						{{header.text}}
+						<div class="sort-container">
+							<fa-icon @click="sort(header.value as keyof Item, 'to-bottom')" icon="fa-caret-up"></fa-icon>
+							<fa-icon @click="sort(header.value as keyof Item, 'to-top')" icon="fa-caret-down"></fa-icon>
+						</div>
+					</div>
 				</th>
 			</tr>
 		</thead>
-		<tbody class="table__body">
-			<tr v-for="item in items" :key="item.id">
-				<td>{{item.date}}</td>
-				<td>{{item.title}}</td>
-				<td>{{item.amount}}</td>
-				<td>{{item.distance}}</td>
+		<tbody class="table__body body">
+			<tr v-for="row in rows" :key="row.id">
+				<td class="body__cell">{{row.date}}</td>
+				<td class="body__cell">{{row.title}}</td>
+				<td class="body__cell">{{row.amount}}</td>
+				<td class="body__cell">{{row.distance}}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -59,6 +77,34 @@ defineProps<{
 
 	&__body tr:nth-child(even) {
 		background-color: #f3f3f3;
+	}
+}
+
+.head {
+	&__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	&__cell:first-child .sort-container {
+		display: none;
+	}
+}
+
+.sort-container {
+	display: flex;
+	flex-direction: column;
+
+	svg {
+		font-size: 1.6rem;
+		color: #908986;
+		transition: .3s ease;
+		cursor: pointer;
+	}
+
+	svg:hover {
+		color: #4d423d;
 	}
 }
 </style>
